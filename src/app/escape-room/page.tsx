@@ -1,0 +1,1 @@
+export default function EscapeRoom() { return <h1>Escape Room (WIP)</h1>; }

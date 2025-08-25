@@ -1,26 +1,86 @@
-@import "tailwindcss";
+:root { --bg:#fff; --fg:#111; --line:#111; --muted:#666; }
+html[data-theme="dark"] { --bg:#0f1115; --fg:#eaeaea; --line:#eaeaea; --muted:#aaa; }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);font-family:system-ui,Arial,sans-serif;line-height:1.45}
+a{color:inherit;text-decoration:none}
+a:focus,button:focus,textarea:focus{outline:2px solid var(--line);outline-offset:2px}
+.skip-link { position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+.skip-link:focus { position:static; width:auto; height:auto; padding:.5rem; background:var(--line); color:#000; }
+
+/* Header */
+.wf-header{position:sticky;top:0;background:var(--bg);z-index:10;border-bottom:3px solid var(--line)}
+.wf-toprow{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:.4rem 1rem}
+.wf-title{margin:0;text-align:center;font-weight:600}
+.wf-student{text-align:right}
+
+.wf-navrow{display:flex;align-items:center;justify-content:space-between;padding:.3rem 1rem;border-bottom:3px solid var(--line)}
+.wf-nav{display:flex;flex-wrap:wrap;gap:.35rem}
+.wf-navItem .wf-sep{margin:0 .4rem;color:var(--muted)}
+.wf-nav a{padding:.2rem .35rem;border:1px solid transparent}
+.wf-nav a.is-active{border:1px solid var(--line)}
+.wf-rightControls{display:flex;align-items:center;gap:.6rem}
+.wf-about{padding:.2rem .35rem;border:1px solid transparent}
+.wf-about.is-active{border:1px solid var(--line)}
+.wf-burger{display:inline-flex;flex-direction:column;gap:3px;background:none;border:1px solid var(--line);padding:.25rem .35rem;cursor:pointer}
+.wf-burger span{display:block;width:20px;height:2px;background:var(--line)}
+
+/* Toggle switch */
+.wf-switch{display:inline-flex;align-items:center;gap:.4rem;cursor:pointer}
+.wf-switch input{display:none}
+.wf-slider{width:44px;height:22px;border:2px solid var(--line);border-radius:22px;position:relative}
+.wf-slider::after{content:"";position:absolute;top:1px;left:1px;width:16px;height:16px;border:2px solid var(--line);border-radius:50%;background:var(--bg);transition:transform .2s}
+.wf-switch input:checked + .wf-slider::after{transform:translateX(20px)}
+.wf-switchLabel-compact{font-size:.9rem}
+
+/* Main layout */
+main{padding:1rem}
+.wf-sectionTitle{margin:.5rem 0 1rem}
+.wf-grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5rem;align-items:start}
+
+/* Left column (steps) */
+.wf-rowLabel{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem}
+.wf-plus{border:1px solid var(--line);background:none;padding:.1rem .45rem;font-weight:700}
+.wf-stepList{display:flex;flex-direction:column;gap:.6rem}
+.wf-step{background:none;border:1px solid transparent;padding:.25rem .6rem;text-align:left}
+.wf-step.is-active{border:2px solid var(--line)}
+
+/* Middle column (content box) */
+.wf-subTitle{margin:0 0 .5rem}
+.wf-contentBox{border:2px solid var(--line);padding:.6rem;min-height:220px;display:block}
+.wf-contentBox textarea{width:100%;height:180px;border:none;background:transparent;color:inherit;resize:vertical}
+
+/* Right column (output/code) */
+.wf-outputLabel{display:inline-block;border:1px solid var(--line);padding:.15rem .5rem;margin-bottom:.4rem}
+.wf-codeBox{border:3px solid var(--line);padding:.8rem;min-height:220px;white-space:pre-wrap;overflow:auto}
+
+/* Footer */
+footer.footer{border-top:4px solid var(--line);text-align:center;padding:1rem;margin-top:1.5rem}
+
+/* Burger dropdown */
+.wf-burgerWrap{position:relative}
+.wf-menu{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  border:2px solid var(--line);
+  background:var(--bg);
+  min-width:160px;
+  padding:.25rem;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  display:none;
+  z-index:20;
 }
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.wf-menu.is-open{display:block}
+.wf-menuItem{
+  width:100%;
+  text-align:left;
+  background:none;
+  border:1px solid transparent;
+  padding:.4rem .5rem;
+  cursor:pointer;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.wf-menuItem:hover,
+.wf-menuItem:focus{
+  border:1px solid var(--line);
 }

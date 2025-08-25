@@ -1,42 +1,31 @@
-'use client';
-
+"use client";
 import { useEffect, useState } from "react";
 
-export default function ThemeToggle() {
+export default function ThemeToggle({ compact=false, label="Dark Mode" }:{
+  compact?: boolean; label?: string;
+}) {
   const [dark, setDark] = useState(false);
 
-  // Load saved theme on first mount
   useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    if (stored === "dark") {
-      setDark(true);
-      document.documentElement.setAttribute("data-theme", "dark");
-    } else {
-      setDark(false);
-      document.documentElement.setAttribute("data-theme", "light");
-    }
+    const saved = localStorage.getItem("theme");
+    const isDark = saved ? saved === "dark" : false;
+    setDark(isDark);
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
   }, []);
 
-  function toggleTheme() {
-    const newDark = !dark;
-    setDark(newDark);
-    document.documentElement.setAttribute("data-theme", newDark ? "dark" : "light");
-    localStorage.setItem("theme", newDark ? "dark" : "light");
+  function toggle() {
+    const nextDark = !dark;
+    setDark(nextDark);
+    localStorage.setItem("theme", nextDark ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", nextDark ? "dark" : "light");
   }
 
   return (
-    <button
-      type="button"
-      onClick={toggleTheme}
-      aria-label="Toggle dark mode"
-      style={{
-        border: "1px solid var(--border)",
-        padding: "6px 10px",
-        borderRadius: 6,
-        cursor: "pointer",
-      }}
-    >
-      {dark ? "🌙 Dark" : "☀️ Light"}
-    </button>
+    <label className={`wf-switch ${compact ? "is-compact" : ""}`}>
+      <input type="checkbox" checked={dark} onChange={toggle} aria-label={label} />
+      <span className="wf-slider" aria-hidden="true"></span>
+      {!compact && <span className="wf-switchLabel">{label}</span>}
+      {compact && <span className="wf-switchLabel-compact">{label}</span>}
+    </label>
   );
 }
