@@ -37,7 +37,8 @@ export default function Stage({ stage, onNext }: StageProps) {
           <button
             onClick={() => {
               const correct =
-                input.trim() === "for (let i = 0; i < 10; i++) { console.log(i); }";
+                input.trim() ===
+                "for (let i = 0; i < 10; i++) { console.log(i); }";
               if (correct) {
                 setOutput("✅ Correct! Moving to next stage...");
                 setTimeout(onNext, 1000);
@@ -57,66 +58,65 @@ export default function Stage({ stage, onNext }: StageProps) {
     // ---------------------------------------------
     // 🧮 STAGE 2: Write a Function
     // ---------------------------------------------
-    // 🧮 STAGE 2: Write a Function
-        // 🧮 STAGE 2: Write a Function
-        case 2:
-        return (
-            <div>
-            <h2>Stage 2 – Write a Function</h2>
-            <p>
-                Write a JavaScript function named <code>add</code> that returns the sum of 2 numbers.
-            </p>
+    case 2:
+      return (
+        <div>
+          <h2>Stage 2 – Write a Function</h2>
+          <p>
+            Write a JavaScript function named <code>add</code> that returns the
+            sum of 2 numbers.
+          </p>
 
-            <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={`Example:\nfunction add(a, b) {\n  return a + b;\n}`}
-                className="border w-full mt-3 p-2 font-mono text-sm"
-                rows={4}
-            />
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder={`Example:\nfunction add(a, b) {\n  return a + b;\n}`}
+            className="border w-full mt-3 p-2 font-mono text-sm"
+            rows={4}
+          />
 
-            <button
-                onClick={() => {
-                try {
-                    // run user code in its own scope and capture the return value
-                    let result;
-                    const testRunner = new Function(`
-                    ${input}
-                    if (typeof add !== 'function') throw new Error('add not defined');
-                    return add(2, 2);
-                    `);
+          <button
+            onClick={() => {
+              try {
+                // Create and test user function in a safe global scope
+                const testRunner = new Function(`
+                  ${input}
+                  if (typeof add !== 'function') throw new Error('add not defined');
+                  return add(2, 2);
+                `);
 
-                    result = testRunner();
+                const result = testRunner();
 
-                    if (result === 4) {
-                    setOutput("✅ Function works! Proceeding...");
-                    setTimeout(onNext, 1000);
-                    } else {
-                    setOutput("❌ Function incorrect or returned wrong value.");
-                    }
-                } catch (err: any) {
-                    console.error(err);
-                    setOutput("❌ Syntax error or function not defined properly.");
+                if (result === 4) {
+                  setOutput("✅ Function works! Proceeding...");
+                  setTimeout(onNext, 1000);
+                } else {
+                  setOutput("❌ Function incorrect or returned wrong value.");
                 }
-                }}
-                className="border px-4 py-1 mt-2 bg-blue-100 hover:bg-blue-200"
-            >
-                Run Function
-            </button>
+              } catch (err: unknown) {
+                console.error("Stage 2 error:", err);
+                setOutput("❌ Syntax error or function not defined properly.");
+              }
+            }}
+            className="border px-4 py-1 mt-2 bg-blue-100 hover:bg-blue-200"
+          >
+            Run Function
+          </button>
 
-            <p className="mt-2">{output}</p>
+          <p className="mt-2">{output}</p>
 
-            <details className="mt-3 text-sm">
-                <summary className="cursor-pointer text-blue-600">💡 Show Answer</summary>
-                <pre className="bg-gray-100 p-2 rounded-md text-left inline-block mt-1">
-        {`function add(a, b) {
-        return a + b;
-        }`}
-                </pre>
-            </details>
-            </div>
-        );
-
+          <details className="mt-3 text-sm">
+            <summary className="cursor-pointer text-blue-600">
+              💡 Show Answer
+            </summary>
+            <pre className="bg-gray-100 p-2 rounded-md text-left inline-block mt-1">
+              {`function add(a, b) {
+  return a + b;
+}`}
+            </pre>
+          </details>
+        </div>
+      );
 
     // ---------------------------------------------
     // 🔢 STAGE 3: Generate Numbers
@@ -138,11 +138,13 @@ export default function Stage({ stage, onNext }: StageProps) {
           <button
             onClick={() => {
               try {
+                // Run the user’s code safely
                 // eslint-disable-next-line no-eval
                 eval(input);
                 setOutput("✅ Numbers generated! You escaped!");
                 setTimeout(onNext, 1500);
-              } catch (err) {
+              } catch (err: unknown) {
+                console.error("Stage 3 error:", err);
                 setOutput("❌ Code error. Try again!");
               }
             }}
@@ -158,7 +160,7 @@ export default function Stage({ stage, onNext }: StageProps) {
               💡 Show Answer
             </summary>
             <pre className="bg-gray-100 p-2 rounded-md text-left inline-block mt-1">
-{`for (let i = 0; i <= 1000; i++) {
+              {`for (let i = 0; i <= 1000; i++) {
   console.log(i);
 }`}
             </pre>
@@ -172,7 +174,9 @@ export default function Stage({ stage, onNext }: StageProps) {
     default:
       return (
         <div>
-          <h2 className="text-green-600 text-2xl">🎉 You Escaped the Room!</h2>
+          <h2 className="text-green-600 text-2xl">
+            🎉 You Escaped the Room!
+          </h2>
           <p>All coding challenges completed successfully.</p>
         </div>
       );
