@@ -8,13 +8,18 @@ export default function Stage1() {
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState("");
 
-  const correctAnswer = "for (let i = 0; i < 10; i++) { console.log(i); }";
-
   const handleCheck = () => {
-    if (input.trim() === correctAnswer) {
+    // Clean up user input (remove unnecessary spaces/newlines)
+    const cleanInput = input.replace(/\s+/g, " ").trim();
+
+    // Flexible regex pattern to detect correct for-loop
+    const correctPattern =
+      /for\s*\(\s*let\s+i\s*=\s*0\s*;\s*i\s*<\s*10\s*;\s*i\+\+\s*\)\s*\{\s*console\.log\(i\)\s*;\s*\}/;
+
+    if (correctPattern.test(cleanInput)) {
       setFeedback("✅ Correct! You can move to the next stage.");
     } else {
-      setFeedback("❌ Try again — check your syntax carefully!");
+      setFeedback("❌ Try again — make sure your loop runs from 0 to 9 and logs each number.");
     }
   };
 
@@ -24,6 +29,7 @@ export default function Stage1() {
         title="Stage 1 – Fix the Code"
         description="This loop has an error. Type the correct version below to proceed."
       >
+        {/* Broken Code Example */}
         <pre className="bg-gray-700 p-3 rounded-md mb-3 text-left text-yellow-200">
           for (let i = 0; i &lt; 10; i+) {"{"} console.log(i) {"}"}
         </pre>
@@ -48,6 +54,7 @@ export default function Stage1() {
             Check Answer
           </button>
 
+          {/* Feedback */}
           {feedback && (
             <p
               className={`text-sm font-semibold ${
@@ -58,11 +65,14 @@ export default function Stage1() {
             </p>
           )}
 
+          {/* Next Stage Button */}
           {feedback.includes("✅") && (
             <Link
               href="/escape-room/stage2"
-              className="inline-block bg-green-500 hover:bg-green-400 text-black px-6 py-2 rounded-lg 
-                         font-bold shadow-[0_0_15px_rgba(0,255,0,0.5)] transition-transform hover:scale-105 mt-2"
+              className="inline-block bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-lg 
+                         font-bold shadow-[0_0_25px_rgba(0,255,0,0.8)] transition-transform hover:scale-110 mt-4 
+                         border border-white/40"
+              style={{ textShadow: "0 0 10px white, 0 0 20px white" }}
             >
               Next Stage →
             </Link>
