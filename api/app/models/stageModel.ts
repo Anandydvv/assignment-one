@@ -56,3 +56,4 @@ export function getStageModel() {
 }
 
 export default Stage;
+

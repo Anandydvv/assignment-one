@@ -32,15 +32,10 @@ export async function OPTIONS() {
 
 type SavePayload = { stage: unknown; output: unknown };
 
-async function ensureStageModel() {
-  const Stage = getStageModel();
-  await Stage.sync();
-  return Stage;
-}
-
 export async function POST(req: NextRequest) {
   try {
-    const Stage = await ensureStageModel();
+    const Stage = getStageModel();
+    await Stage.sync();
     const json = (await req.json()) as SavePayload | SavePayload[];
     const inputs = Array.isArray(json) ? json : [json];
 
@@ -66,9 +61,7 @@ export async function POST(req: NextRequest) {
       sanitized.map(async (item) => {
         await Stage.upsert(item);
         const record = await Stage.findOne({ where: { stage: item.stage } });
-        if (!record) {
-          throw new Error(`Stage not persisted: ${item.stage}`);
-        }
+        if (!record) throw new Error(`Stage not persisted: ${item.stage}`);
         return record.toJSON();
       })
     );
@@ -83,9 +76,10 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   try {
-    const Stage = await ensureStageModel();
+    const Stage = getStageModel();
+    await Stage.sync();
     const stages = await Stage.findAll({ order: [["stage", "ASC"]] });
-    return jsonWithCors(stages.map((stage) => stage.toJSON()));
+    return jsonWithCors(stages.map((s) => s.toJSON()));
   } catch (error) {
     console.error("Failed to fetch stages", error);
     return jsonWithCors({ error: "Unable to fetch stages." }, { status: 500 });
@@ -94,7 +88,8 @@ export async function GET() {
 
 export async function PUT(req: NextRequest) {
   try {
-    const Stage = await ensureStageModel();
+    const Stage = getStageModel();
+    await Stage.sync();
     const { id, output, stage } = (await req.json()) as {
       id?: unknown;
       stage?: unknown;
@@ -107,7 +102,7 @@ export async function PUT(req: NextRequest) {
     }
 
     let record = null;
-    if (typeof id === "number" || (typeof id === "string" && id.trim())) {
+    if (typeof id === "number" || (typeof id === "string" && (id as string).trim())) {
       record = await Stage.findByPk(Number(id));
     } else if (typeof stage === "string" && stage.trim()) {
       record = await Stage.findOne({ where: { stage: stage.trim() } });
@@ -117,7 +112,7 @@ export async function PUT(req: NextRequest) {
       return jsonWithCors({ error: "Stage not found" }, { status: 404 });
     }
 
-    const updated = await record.update({ output: newOutput });
+    const updated = await (record as any).update({ output: newOutput });
     return jsonWithCors(updated.toJSON());
   } catch (error) {
     console.error("Failed to update stage", error);
@@ -127,14 +122,15 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
-    const Stage = await ensureStageModel();
+    const Stage = getStageModel();
+    await Stage.sync();
     const { id, stage } = (await req.json()) as {
       id?: unknown;
       stage?: unknown;
     };
 
     let record = null;
-    if (typeof id === "number" || (typeof id === "string" && id.trim())) {
+    if (typeof id === "number" || (typeof id === "string" && (id as string).trim())) {
       record = await Stage.findByPk(Number(id));
     } else if (typeof stage === "string" && stage.trim()) {
       record = await Stage.findOne({ where: { stage: stage.trim() } });
@@ -144,7 +140,7 @@ export async function DELETE(req: NextRequest) {
       return jsonWithCors({ error: "Stage not found" }, { status: 404 });
     }
 
-    await record.destroy();
+    await (record as any).destroy();
     return jsonWithCors({ message: "Stage deleted successfully" });
   } catch (error) {
     console.error("Failed to delete stage", error);

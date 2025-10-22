@@ -16,7 +16,7 @@ export default function getSequelize(): Sequelize {
     try {
       fs.mkdirSync(dir, { recursive: true });
     } catch {
-      /* no-op: directory may already exist or be unwritable in read-only envs */
+      /* no-op */
     }
 
     _sequelize = new Sequelize({
@@ -27,3 +27,4 @@ export default function getSequelize(): Sequelize {
   }
   return _sequelize;
 }
+

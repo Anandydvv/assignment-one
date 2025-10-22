@@ -15,16 +15,10 @@ const STAGE_OUTPUT_KEYS: Array<{ stage: string; storageKey: string }> = [
   { stage: "stage4", storageKey: "stage4Output" },
 ];
 
-function getApiBase() {
-  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
-  }
-
-  if (typeof window !== "undefined" && window.location.origin) {
-    return window.location.origin;
-  }
-
-  return "http://localhost:4000";
+// Use the frontend’s own proxy route to avoid CORS/host mismatch.
+// The proxy lives at frontend/src/app/api/stages/route.ts
+function getStagesUrl() {
+  return "/api/stages";
 }
 
 export default function SaveProgressButton() {
@@ -48,6 +42,8 @@ export default function SaveProgressButton() {
     return items;
   };
 
+  // No need for candidate bases when using the proxy route
+
   async function handleSaveAll() {
     const payloads = buildPayloads();
 
@@ -61,21 +57,42 @@ export default function SaveProgressButton() {
     setMessage("");
 
     try {
-      const base = getApiBase();
-      const response = await fetch(`${base}/api/stages`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payloads),
-      });
-
-      if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        const detail = body && typeof body.error === "string" ? body.error : `HTTP ${response.status}`;
-        throw new Error(detail);
+      async function tryPost(url: string) {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payloads),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => null);
+          const detail = body && typeof body.error === "string" ? body.error : `HTTP ${res.status}`;
+          throw new Error(detail);
+        }
       }
 
-      setStatus("done");
-      setMessage("Progress saved to the control room.");
+      const tried: string[] = [];
+      const candidates = [
+        getStagesUrl(),
+        typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_URL
+          ? `${process.env.NEXT_PUBLIC_API_URL}/api/stages`
+          : "",
+        typeof window !== "undefined" ? `${window.location.protocol}//localhost:4000/api/stages` : "",
+      ].filter(Boolean) as string[];
+
+      let lastError: Error | null = null;
+      for (const url of candidates) {
+        tried.push(url);
+        try {
+          await tryPost(url);
+          setStatus("done");
+          setMessage("Progress saved to the control room.");
+          return;
+        } catch (e) {
+          lastError = e instanceof Error ? e : new Error(String(e));
+        }
+      }
+
+      throw new Error(`${lastError ? lastError.message : "Unknown error"} (tried: ${tried.join(", ")})`);
     } catch (err) {
       setStatus("error");
       const fallback = err instanceof Error ? err.message : "Unknown error";
@@ -92,7 +109,7 @@ export default function SaveProgressButton() {
         type="button"
         onClick={handleSaveAll}
         disabled={status === "saving"}
-        className={`px-4 py-2 rounded-md text-white text-sm font-medium transition-colors ${
+        className={`px-4 py-2 rounded-md text-black text-sm font-medium transition-colors ${
           status === "saving"
             ? "bg-gray-500"
             : status === "done"
