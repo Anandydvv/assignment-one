@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Timer from "./Timer";
+import SaveProgressButton from "./SaveProgressButton";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,9 +13,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {/* --- Dark overlay --- */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm z-0"></div>
 
-      {/* --- Timer --- */}
-      <div className="absolute top-6 right-6 z-10">
+      {/* --- Top-right controls: Timer + Save --- */}
+      <div className="absolute top-6 right-6 z-10 flex gap-3 items-center">
         <Timer />
+        <SaveProgressButton />
       </div>
 
       {/* --- Main content box --- */}

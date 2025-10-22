@@ -1,24 +1,26 @@
-# API Dockerfile (Next.js, Node 20 Alpine)
-# - Installs dependencies
-# - Builds the production app (generates .next)
-# - Starts with `npm start` on port 4000
+# ---------------------------------------
+# 🐳 Dockerfile for Next.js API (CRUD)
+# ---------------------------------------
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Install dependencies using package lock for reproducibility
-COPY package*.json ./
-RUN npm install
+# System deps for native modules (e.g., sqlite3)
+RUN apk add --no-cache python3 make g++
 
-# Copy the rest of the app source
+# Copy package files and install dependencies (omit dev deps)
+COPY package*.json ./
+RUN npm install --omit=dev
+
+# Copy all source code
 COPY . .
 
-# Build the Next.js app for production so `.next` exists at runtime
+# Build the Next.js API
 RUN npm run build
 
-# Next.js will listen on PORT (default 3000). We use 4000 here.
+# Runtime port configuration for Next.js
 ENV PORT=4000
 EXPOSE 4000
 
-# Run the production server
+# Start the Next.js server
 CMD ["npm", "start"]

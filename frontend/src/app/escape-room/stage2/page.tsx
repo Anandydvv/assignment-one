@@ -1,6 +1,6 @@
 "use client";
 export const dynamic = "force-dynamic";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Layout from "../components/Layout";
 import Stage from "../components/Stage";
@@ -8,6 +8,16 @@ import Stage from "../components/Stage";
 export default function Stage2() {
   const [clicked, setClicked] = useState(false);
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    try {
+      if (message.includes("�o.")) {
+        localStorage.setItem("stage2Output", "green");
+      } else {
+        localStorage.removeItem("stage2Output");
+      }
+    } catch {}
+  }, [message]);
 
   const handleClick = (color: string) => {
     if (color === "green") {

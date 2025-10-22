@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Layout from "../components/Layout";
 import Stage from "../components/Stage";
@@ -8,6 +8,17 @@ export default function Stage4() {
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState("");
   const [output, setOutput] = useState("");
+
+  useEffect(() => {
+    try {
+      if (feedback.includes("�o.")) {
+        // Persist the produced JSON output
+        localStorage.setItem("stage4Output", output || "");
+      } else {
+        localStorage.removeItem("stage4Output");
+      }
+    } catch {}
+  }, [feedback, output]);
 
   const handleCheck = () => {
     // Clean input

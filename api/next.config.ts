@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+// Use default output; we run with `next start` in the container
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

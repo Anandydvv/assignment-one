@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Layout from "../components/Layout";
 import Stage from "../components/Stage";
@@ -8,6 +8,17 @@ export default function Stage3() {
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState("");
   const [output, setOutput] = useState<number[]>([]);
+
+  useEffect(() => {
+    try {
+      if (feedback.includes("�o.")) {
+        // Save a compact note rather than huge 0..1000 list
+        localStorage.setItem("stage3Output", "Generated numbers 0..1000");
+      } else {
+        localStorage.removeItem("stage3Output");
+      }
+    } catch {}
+  }, [feedback]);
 
   const handleCheck = () => {
     // Clean user input (remove extra spaces, newlines)

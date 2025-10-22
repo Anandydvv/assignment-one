@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Layout from "./components/Layout";
 import Stage from "./components/Stage";
@@ -7,6 +7,16 @@ import Stage from "./components/Stage";
 export default function Stage1() {
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState("");
+
+  useEffect(() => {
+    try {
+      if (feedback.includes("�o.")) {
+        localStorage.setItem("stage1Output", input);
+      } else {
+        localStorage.removeItem("stage1Output");
+      }
+    } catch {}
+  }, [feedback, input]);
 
   const handleCheck = () => {
     // Clean up user input (remove unnecessary spaces/newlines)
