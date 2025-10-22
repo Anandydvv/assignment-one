@@ -12,5 +12,9 @@
     "react-dom": "^18.2.0",
     "sequelize": "^6.35.0",
     "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "typescript": "5.9.3"
   }
 }
