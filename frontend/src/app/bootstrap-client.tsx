@@ -1,9 +1,13 @@
 'use client';
 
-// Static import is fine in a client-only component.
-// This avoids TS complaints with dynamic import on some setups.
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import { useEffect } from 'react';
 
 export default function BootstrapClient() {
+  // Load Bootstrap JS only in the browser to avoid SSR "document" errors
+  useEffect(() => {
+    import('bootstrap/dist/js/bootstrap.bundle.min.js').catch(() => {
+      // no-op: avoid breaking if import fails during hydration
+    });
+  }, []);
   return null;
 }

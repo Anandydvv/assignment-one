@@ -19,8 +19,14 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    try { localStorage.setItem('lastRoute', pathname); } catch {}
-    document.cookie = `lastTab=${encodeURIComponent(pathname)}; path=/; SameSite=Lax; max-age=${60*60*24*365}`;
+    if (typeof document !== "undefined") {
+      try {
+        localStorage.setItem('lastRoute', pathname);
+        document.cookie = `lastTab=${encodeURIComponent(pathname)}; path=/; SameSite=Lax; max-age=${60 * 60 * 24 * 365}`;
+      } catch (err) {
+        console.error("Header useEffect error:", err);
+      }
+    }
   }, [pathname]);
 
   return (

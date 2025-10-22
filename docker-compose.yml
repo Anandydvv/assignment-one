@@ -5,9 +5,10 @@ services:
     build: ./frontend
     container_name: escape-frontend
     ports:
-      - "3000:3000"
+      - "3000:3000" # Next.js frontend on port 3000
     environment:
       - NODE_ENV=production
+      # FRONTEND uses default Next.js port (3000)
     depends_on:
       - api
 
@@ -15,9 +16,10 @@ services:
     build: ./api
     container_name: escape-api
     ports:
-      - "8000:8000"
+      - "4000:4000" # Next.js API on port 4000
     environment:
       - NODE_ENV=production
+      - PORT=4000 # Next.js reads PORT to bind server
     volumes:
       # Mount .pem securely (read-only)
       - ./dockersequelizekey.pem:/run/secrets/dockersequelizekey.pem:ro

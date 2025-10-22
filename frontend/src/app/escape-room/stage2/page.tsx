@@ -1,4 +1,5 @@
 "use client";
+export const dynamic = "force-dynamic";
 import { useState } from "react";
 import Link from "next/link";
 import Layout from "../components/Layout";
@@ -29,12 +30,11 @@ export default function Stage2() {
             <button
               key={color}
               onClick={() => handleClick(color)}
-              className={`w-36 h-36 sm:w-40 sm:h-40 rounded-full transition-transform duration-300 
-                          border-4 border-${color}-400/70 shadow-[0_0_35px_${color}] 
-                          hover:scale-110 hover:shadow-[0_0_60px_${color}] active:scale-95`}
+              className="w-36 h-36 sm:w-40 sm:h-40 rounded-full transition-transform duration-300 hover:scale-110 active:scale-95"
               style={{
                 backgroundColor: color,
-                boxShadow: `0 0 30px ${color}, inset 0 0 20px ${color}`,
+                border: `4px solid ${color}`,
+                boxShadow: `0 0 35px ${color}, inset 0 0 20px ${color}`,
               }}
             />
           ))}

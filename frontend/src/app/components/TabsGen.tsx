@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 type Tab = { title: string; content: string };
 
@@ -15,6 +15,12 @@ export default function TabsGen() {
     { title: "Step 3", content: "Step 3: Finish." },
   ]);
   const [active, setActive] = useState(1); // highlight Step 2
+  const [isClient, setIsClient] = useState(false);
+
+  // ✅ make sure DOM access happens only in browser
+  useEffect(() => {
+    if (typeof document !== "undefined") setIsClient(true);
+  }, []);
 
   // 🟢 ADD tab
   function addTab() {
@@ -38,7 +44,7 @@ export default function TabsGen() {
     }
   }
 
-  // 🔨 OUTPUT string generation (now uses CSS variables)
+  // 🔨 OUTPUT string generation (uses CSS vars)
   const output = useMemo(() => {
     const titles = tabs
       .map(
@@ -65,18 +71,21 @@ export default function TabsGen() {
       )
       .join("");
 
+    // ✅ DOM script only runs client-side, so keep it as a string
     const js = `
 <script>
 function selectTab(i){
-  var tabs=document.querySelectorAll('[role="tab"]');
-  var panels=document.querySelectorAll('[role="tabpanel"]');
-  tabs.forEach(function(tab,idx){
-    var on=idx===i;
-    tab.setAttribute('aria-selected',on);
-    tab.style.background=on?'var(--muted)':'var(--bg)';
-    tab.style.color='var(--fg)';
-    panels[idx].hidden=!on;
-  });
+  if (typeof document !== "undefined") {
+    var tabs=document.querySelectorAll('[role="tab"]');
+    var panels=document.querySelectorAll('[role="tabpanel"]');
+    tabs.forEach(function(tab,idx){
+      var on=idx===i;
+      tab.setAttribute('aria-selected',on);
+      tab.style.background=on?'var(--muted)':'var(--bg)';
+      tab.style.color='var(--fg)';
+      panels[idx].hidden=!on;
+    });
+  }
 }
 </script>`.trim();
 
@@ -149,7 +158,7 @@ ${js}`;
         <div>
           <label className="wf-outputLabel">Output</label>
           <pre className="wf-codeBox" aria-label="Generated HTML/JS">
-            {output}
+            {isClient ? output : "Loading..."}
           </pre>
         </div>
       </div>
