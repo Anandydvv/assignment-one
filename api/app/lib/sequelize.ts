@@ -6,7 +6,8 @@ export default function getSequelize(): Sequelize {
   if (!_sequelize) {
     _sequelize = new Sequelize({
       dialect: "sqlite",
-      storage: "./stages.sqlite", // local DB file inside container
+      // Persist DB under a dedicated folder that is volume-mounted via docker-compose
+      storage: "/app/sqlite/stages.sqlite",
       logging: false,
     });
   }

@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
-// Use default output; we run with `next start` in the container
-const nextConfig: NextConfig = {};
+// Ensure native modules resolve at runtime in the server build
+const nextConfig: NextConfig = {
+  serverExternalPackages: ["sqlite3", "sequelize"],
+};
 
 export default nextConfig;

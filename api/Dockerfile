@@ -15,8 +15,8 @@ RUN npm install --omit=dev
 # Copy all source code
 COPY . .
 
-# Build the Next.js API
-RUN npm run build
+# Build the Next.js API (clear cache to ensure fresh bundle)
+RUN rm -rf .next && npm run build
 
 # Runtime port configuration for Next.js
 ENV PORT=4000
