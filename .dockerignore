@@ -1,0 +1,8 @@
+# Ignore large and sensitive files
+node_modules
+npm-debug.log
+Dockerfile
+docker-compose.yml
+.git
+.next
+*.pem
