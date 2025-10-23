@@ -14,7 +14,58 @@ const CANDIDATE_BASES: string[] = [
 
 async function forward(req: Request) {
   const url = new URL(req.url);
-  const path = url.pathname; // e.g. /api/stages
+  const path = url.pathname + url.search; // preserve query string (e.g. ?tz=America/New_York)
+
+  // Helpers to localize any ISO timestamps in JSON bodies
+  function extractTimeZone() {
+    const qpTz = url.searchParams.get("tz") || url.searchParams.get("timezone");
+    const hdrTz =
+      req.headers.get("x-timezone") ||
+      req.headers.get("time-zone") ||
+      req.headers.get("timezone");
+    return (qpTz || hdrTz || undefined) as string | undefined;
+  }
+
+  function formatLocalDate(value: unknown, timeZone?: string) {
+    if (!value) return value as undefined;
+    const d = new Date(value as any);
+    if (isNaN(d.getTime())) return value as unknown as string;
+    try {
+      return new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+        ...(timeZone ? { timeZone } : {}),
+      }).format(d);
+    } catch {
+      return d.toLocaleString();
+    }
+  }
+
+  function isIsoLike(s: string) {
+    // quick check for common ISO forms
+    return /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(s);
+  }
+
+  function transformDates(value: any, timeZone?: string): any {
+    if (Array.isArray(value)) return value.map((v) => transformDates(v, timeZone));
+    if (value && typeof value === "object") {
+      const out: Record<string, any> = {};
+      for (const [k, v] of Object.entries(value)) {
+        if ((k === "createdAt" || k === "updatedAt") && typeof v === "string" && isIsoLike(v)) {
+          out[k] = formatLocalDate(v, timeZone);
+        } else {
+          out[k] = transformDates(v, timeZone);
+        }
+      }
+      return out;
+    }
+    return value;
+  }
 
   // Copy body only for methods that allow it
   const method = req.method.toUpperCase();
@@ -27,6 +78,7 @@ async function forward(req: Request) {
   headers.delete("connection");
 
   let lastErr: unknown = null;
+  const tz = extractTimeZone();
   for (const base of CANDIDATE_BASES) {
     try {
       const target = new URL(path, base).toString();
@@ -36,10 +88,20 @@ async function forward(req: Request) {
         body: body as unknown as BodyInit | null | undefined,
       });
 
-      // Pipe through response from API
-      const resBody = await res.arrayBuffer();
-      const headersObj = Object.fromEntries(res.headers.entries());
-      return new NextResponse(resBody, { status: res.status, headers: headersObj });
+      // If JSON, localize timestamps before returning; else pipe through
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/json")) {
+        const json = await res.json();
+        const localized = transformDates(json, tz);
+        // merge headers but ensure content-type stays JSON
+        const headersObj = Object.fromEntries(res.headers.entries());
+        headersObj["content-type"] = "application/json";
+        return NextResponse.json(localized, { status: res.status, headers: headersObj });
+      } else {
+        const resBody = await res.arrayBuffer();
+        const headersObj = Object.fromEntries(res.headers.entries());
+        return new NextResponse(resBody, { status: res.status, headers: headersObj });
+      }
     } catch (err) {
       lastErr = err;
       // try next candidate

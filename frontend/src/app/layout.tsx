@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './globals.css';
 import BootstrapClient from './bootstrap-client';
 import Header from './components/Header';   // <— this path
+import InstrumentationClient from './components/InstrumentationClient';
 
 import Footer from './components/Footer';
 
@@ -18,6 +19,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         {/* Enable Bootstrap components (collapse, dropdown, etc.) */}
         <BootstrapClient />
+        {/* Client-side instrumentation (Web Vitals, fetch timing) */}
+        <InstrumentationClient />
 
         <a className="skip-link" href="#main">Skip to content</a>
 
