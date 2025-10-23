@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './globals.css';
 import BootstrapClient from './bootstrap-client';
 import Header from './components/Header';   // <— this path
-import InstrumentationClient from './components/InstrumentationClient';
+import InstrumentationClient from './escape-room/components/InstrumentationClient';
 
 import Footer from './components/Footer';
 

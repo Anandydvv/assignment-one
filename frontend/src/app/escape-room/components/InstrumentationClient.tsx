@@ -4,7 +4,6 @@ import { useEffect } from "react";
 function safeObserve(type: string, cb: PerformanceObserverCallback) {
   try {
     const po = new PerformanceObserver(cb);
-    // @ts-expect-error: type/buffered supported in modern browsers
     po.observe({ type, buffered: true });
     return po;
   } catch {
